@@ -60,7 +60,7 @@ contract VaultTest is Test {
                 salt
             );
         vm.startPrank(owner);
-    vault.delegateTo(operator, approverSignatureAndExpiry, salt);
+        vault.delegateTo(operator, approverSignatureAndExpiry, salt);
         vm.stopPrank();
     }
 
