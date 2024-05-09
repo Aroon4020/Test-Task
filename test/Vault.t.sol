@@ -12,6 +12,7 @@ contract VaultTest is Test {
     uint256 operatorPrivateKey = 0xabc123;
     address owner = address(1234);
     address alice = address(234);
+    uint256 withdrawlDelay = 50400;
     address operator;
     Vault public vault;
     IERC20 stETH;
@@ -110,7 +111,7 @@ contract VaultTest is Test {
                 strategies,
                 shares
             );
-        vm.roll(block.number + 50400);
+        vm.roll(block.number + withdrawlDelay);
         vault.withdrawToContract(withdrawal);
         vm.stopPrank();
     }
@@ -146,7 +147,7 @@ contract VaultTest is Test {
 
         vm.startPrank(whale);
         stETH.approve(address(vault), 1 ether);
-        vm.roll(block.number + 50400);
+        vm.roll(block.number + withdrawlDelay);
         vault.deposit(0.1 ether);
         vm.startPrank(owner);
         vault.withdrawToContract(withdrawal);
