@@ -38,9 +38,8 @@ To interact with the Vault Contract:
 5. **Pause/Unpause:** Use the `pauseVault` and `unpauseVault` functions to pause and unpause the vault contract respectively.
 
 
-## Usage Instructions
 
-### Cloning and Setup
+## Cloning and Setup
 
 1. **Clone Repository:** Clone the repository containing the contract source code:
   ```
