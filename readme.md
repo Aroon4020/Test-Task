@@ -36,3 +36,26 @@ To interact with the Vault Contract:
 3. **Undelegate Assets:** Call the `undelegate` function to undelegate assets from the current operator.
 4. **Withdraw Assets:** Utilize the `withdrawToContract` function to withdraw assets from EigenLayer to this contract.
 5. **Pause/Unpause:** Use the `pauseVault` and `unpauseVault` functions to pause and unpause the vault contract respectively.
+
+
+## Usage Instructions
+
+### Cloning and Setup
+
+1. **Clone Repository:** Clone the repository containing the contract source code:
+2. **Navigate to Project Directory:** Change into the project directory:
+3. **Build Contract:** Build the contract using Forge:
+
+4. **Test Contract with Mainnet Forking:**
+- anvil --fork-url YOUR_QUICKNODE/ALCHEMY_ENDPOINT_URL --fork-block-number 19741139
+  ```
+- Keep the old terminal running.
+
+5. **Run Tests:**
+- Open another new bash terminal.
+- Run tests with RPC URL and match path:
+  ```
+  forge test --rpc-url http://127.0.0.1:8545/ --match-path test/Vault.t.sol
+  ```
+
+
