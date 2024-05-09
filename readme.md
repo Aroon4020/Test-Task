@@ -43,11 +43,20 @@ To interact with the Vault Contract:
 ### Cloning and Setup
 
 1. **Clone Repository:** Clone the repository containing the contract source code:
+  ```
+  git clone repo-url
+  ```
 2. **Navigate to Project Directory:** Change into the project directory:
+  ```
+  cd Test-Task
+  ```
 3. **Build Contract:** Build the contract using Forge:
-
+  ```
+  forge build
+  ```
 4. **Test Contract with Mainnet Forking:**
-- anvil --fork-url YOUR_QUICKNODE/ALCHEMY_ENDPOINT_URL --fork-block-number 19741139
+  ```
+  forge test --rpc-url http://127.0.0.1:8545/ --match-path test/Vault.t.sol
   ```
 - Keep the old terminal running.
 
