@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "./interfaces/IVault.sol";
+import "./interfaces/IOracle.sol";
 import "./interfaces/eigenlayer/IDelegationManager.sol";
 import "./interfaces/eigenlayer/IStrategyManager.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -47,6 +48,9 @@ contract Vault is IVault, ERC20, Ownable, Pausable, ReentrancyGuard {
     // Address of the strategy contract
     address constant STRATEGY = 0x93c4b944D05dfe6df7645A86cd2206016c51564D;
 
+    //Address of chainlink data feeds of STETH/ETH;
+    address constant ORACLE = 0x86392dC19c0b719886221c78AB11eb8Cf5c52812;
+
     // Constructor to initialize the ERC20 token and set the owner
     constructor(address _owner) ERC20("RST", "RST") Ownable(_owner) {
         if (_owner == address(0)) revert ZeroAddress();
@@ -59,6 +63,7 @@ contract Vault is IVault, ERC20, Ownable, Pausable, ReentrancyGuard {
     function deposit(
         uint256 depositAmount
     ) external override whenNotPaused nonReentrant {
+       
         // Validate the deposit amount
         if (depositAmount == 0) {
             revert InvalidAmountToDeposit();
@@ -74,20 +79,23 @@ contract Vault is IVault, ERC20, Ownable, Pausable, ReentrancyGuard {
             depositAmount
         );
 
-        // Calculate shares for the user
-        uint256 shares = calculateShareAmount(depositAmount);
-
         // Deposit assets into the strategy
         _depositAssetIntoStrategy(
             stEth,
             IERC20(stEth).balanceOf(address(this))
         );
 
-        // Update Total Value Locked (TVL)
-        TVL += depositAmount;
+        // Convert steth amount To ETH
+        uint256 amountInEth = convertToETH(depositAmount);
+
+        // Calculate shares for the user
+        uint256 shares = calculateShareAmount(amountInEth);
 
         // Mint shares for the user
         _mint(msg.sender, shares);
+
+        // Update Total Value Locked (TVL)
+        TVL += depositAmount;
     }
 
     /**
@@ -161,14 +169,38 @@ contract Vault is IVault, ERC20, Ownable, Pausable, ReentrancyGuard {
 
     /**
      * @notice Calculate shares based on the deposited amount
-     * @param amount The amount of STETH deposited
+     * @param amount The amount deposited
      * @return The calculated shares
      */
     function calculateShareAmount(
         uint256 amount
     ) public view returns (uint256) {
         uint256 supply = totalSupply();
-        return supply == 0 ? amount : Math.mulDiv(amount, supply, TVL);
+        return supply == 0 ? amount : Math.mulDiv(amount, supply, convertToETH(TVL));
+    }
+
+    /**
+     * @notice Converts the value in ETH based on the latest price from the oracle.
+     * @param amount The amount of the asset to be converted.
+     * @return equivalent amount in ETH.
+     */
+    function convertToETH(uint256 amount) public view returns (uint256) {
+        uint256 assetPriceInETH = getLatestPrice();
+        return assetPriceInETH * amount / 1e18;
+    }
+
+
+    /**
+     * @notice Retrieves the latest price.
+     * @return The latest price.
+     */
+    function getLatestPrice() public view returns (uint256) {
+        (, int256 price,,,) = IOracle(ORACLE).latestRoundData();
+        if (price <= 0) {
+            revert InvalidPriceValue(price);
+        }
+
+        return uint256(price);
     }
 
     /**

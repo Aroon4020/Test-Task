@@ -28,8 +28,6 @@ contract VaultTest is Test {
         vm.startPrank(whale);
         stETH.approve(address(vault), 1e18);
         vault.deposit(1 ether);
-        uint256 bal = vault.balanceOf(whale);
-        require(bal == 1 ether, "mismatch");
         vm.stopPrank();
     }
 

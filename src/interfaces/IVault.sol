@@ -6,7 +6,7 @@ interface IVault {
     
     error ZeroAddress();
     error InvalidAmountToDeposit();
-    
+    error InvalidPriceValue(int256 price);
     
 
 
